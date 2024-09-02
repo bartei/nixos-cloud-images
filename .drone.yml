@@ -7,14 +7,15 @@ trigger:
     - push
 
 steps:
-  - name: build-image
-    image: nixos/nix
-    environment:
-      SHELL: /run/current-system/sw/bin/bash
+  - name: install-nix
+    image: debian:bullseye-slim
     commands:
-      - /run/current-system/sw/bin/bash -c "nix-env -iA nixos-generators"
-      - /run/current-system/sw/bin/bash -c "mkdir -p /drone/src/nixos-cloud-image"
-      - /run/current-system/sw/bin/bash -c "nixos-generate -f qcow2 -c /drone/src/configuration.nix -o /drone/src/nixos-cloud-image"
+      - apt-get update && apt-get install -y curl bash
+      - sh <(curl -L https://nixos.org/nix/install) --no-daemon
+      - . /root/.nix-profile/etc/profile.d/nix.sh
+      - nix-env -iA nixos.nixos-generators
+      - mkdir -p /drone/src/nixos-cloud-image
+      - nixos-generate -f qcow2 -c /drone/src/configuration.nix -o /drone/src/nixos-cloud-image
 
     # Cache the Nix store to speed up subsequent builds
     volumes:
