@@ -1,0 +1,30 @@
+kind: pipeline
+type: docker
+name: build-nixos-qcow2
+
+steps:
+  - name: build-image
+    image: nixos/nix
+    commands:
+      - nix-env -iA nixos-generators
+      - mkdir -p /drone/src/nixos-cloud-image
+      - nixos-generate -f qcow2 -c /drone/src/configuration.nix -o /drone/src/nixos-cloud-image
+
+    # Cache the Nix store to speed up subsequent builds
+    volumes:
+      - name: nix-store
+        path: /nix/store
+
+#  - name: upload-image
+#    image: plugins/s3
+#    settings:
+#      bucket: your-s3-bucket-name
+#      access_key: your-access-key
+#      secret_key: your-secret-key
+#      source: /drone/src/nixos-cloud-image/nixos.qcow2
+#      target: images/nixos.qcow2
+
+volumes:
+  - name: nix-store
+    host:
+      path: /nix/store
