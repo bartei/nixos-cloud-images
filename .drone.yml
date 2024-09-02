@@ -12,9 +12,9 @@ steps:
     environment:
       SHELL: /run/current-system/sw/bin/bash
     commands:
-      - nix-env -iA nixos-generators
-      - mkdir -p /drone/src/nixos-cloud-image
-      - nixos-generate -f qcow2 -c configuration.nix -o /drone/src/nixos-cloud-image
+      - /run/current-system/sw/bin/bash -c "nix-env -iA nixos-generators"
+      - /run/current-system/sw/bin/bash -c "mkdir -p /drone/src/nixos-cloud-image"
+      - /run/current-system/sw/bin/bash -c "nixos-generate -f qcow2 -c /drone/src/configuration.nix -o /drone/src/nixos-cloud-image"
 
     # Cache the Nix store to speed up subsequent builds
     volumes:
