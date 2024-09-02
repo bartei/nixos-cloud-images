@@ -2,13 +2,17 @@ kind: pipeline
 type: docker
 name: build-nixos-qcow2
 
+trigger:
+  event:
+    - push
+
 steps:
   - name: build-image
     image: nixos/nix
     commands:
       - nix-env -iA nixos-generators
       - mkdir -p /drone/src/nixos-cloud-image
-      - nixos-generate -f qcow2 -c /drone/src/configuration.nix -o /drone/src/nixos-cloud-image
+      - nixos-generate -f qcow2 -c configuration.nix -o /drone/src/nixos-cloud-image
 
     # Cache the Nix store to speed up subsequent builds
     volumes:
