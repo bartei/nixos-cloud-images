@@ -9,6 +9,8 @@ trigger:
 steps:
   - name: build-image
     image: nixos/nix
+    environment:
+      SHELL: /run/current-system/sw/bin/bash
     commands:
       - nix-env -iA nixos-generators
       - mkdir -p /drone/src/nixos-cloud-image
