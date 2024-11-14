@@ -1,41 +1,47 @@
-{ config, pkgs, ... }:
+{ config, pkgs, modulesPath, lib, ... }: {
+  imports = [
+    # Make sure to have this in all your configurations
+    "${toString modulesPath}/virtualisation/incus-virtual-machine.nix"
+  ];
 
-{
-  imports = [ <nixpkgs/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix> ];
+  services.qemuGuest.enable = true;
 
-  # Set hostname
-  networking.hostName = "nixos-cloud";
+  virtualisation.incus.agent.enable = lib.mkForce false;
 
-  # Enable SSH service
+  services.cloud-init = {
+    enable = true;
+    network.enable = true;
+  };
+  
   services.openssh.enable = true;
+  services.openssh.passwordAuthentication = false;
 
-  # Enable KVM guest support
-  boot.kernelModules = [ "kvm-intel" ];
-
-  # Set root password (for example, set it to 'nixos')
-  users.users.root.initialPassword = "nixos";
-
-  # Add cloud-init for cloud configuration (optional)
-  services.cloud-init.enable = true;
+  nix = {
+    settings.experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+  };
 
   # Basic system settings
   time.timeZone = "UTC";
-  networking.useDHCP = true;
+
   environment.systemPackages = with pkgs; [
     vim
     wget
     curl
+    mc
   ];
 
-  # Ensure systemd services are enabled
-  systemd.services.sshd.wantedBy = [ "multi-user.target" ];
+  networking.firewall.enable = false;
+  networking.useDHCP = lib.mkForce false;
+  security.sudo.wheelNeedsPassword = false;
 
-  # Make the image smaller by removing unnecessary packages
-  boot.cleanTmpDir = true;
-  environment.noXlibs = true;
-
-  # Ensure that the image can boot
-  boot.loader.grub.enable = true;
-  boot.loader.grub.devices = [ "/dev/sda" ];
-  boot.loader.grub.version = 2;
+  users = {
+    users.default = {
+      password = "default";
+      isNormalUser = true;
+      extraGroups = [ "wheel" ];
+    };
+  };
 }
