@@ -12,7 +12,6 @@ release:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-
 build:
   image: nixos/nix
   stage: build

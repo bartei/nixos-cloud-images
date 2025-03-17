@@ -1,7 +1,12 @@
 plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"
-  - "@semantic-release/gitlab"
+  -
+    - "@semantic-release/gitlab"
+    - gitlabUrl: "https://gitlab.provvedo.com"
+      assets:
+        - path: "output/tarball/*"
+          label: "Download Image"
 
 branches:
   - "main"
