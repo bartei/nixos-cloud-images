@@ -1,0 +1,28 @@
+stages:
+  - release
+  - build
+
+release:
+  image: node:23-bookworm
+  stage: release
+  before_script:
+    - npm install -g semantic-release @semantic-release/gitlab
+  script:
+    - semantic-release
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+
+build:
+  image: nixos/nix
+  stage: build
+
+  script:
+    - nix build .\#nixosConfigurations.this.config.system.build.qemuImage -L
+
+  artifacts:
+    paths:
+      - ./result
+
+  only:
+    - tags
