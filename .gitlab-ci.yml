@@ -22,7 +22,7 @@ build:
 
   artifacts:
     paths:
-      - ./result
+      - ./*.tar.gz
 
   only:
     - tags
