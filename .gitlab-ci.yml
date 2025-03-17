@@ -19,12 +19,12 @@ build:
 
   script:
     - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#tarballImage -L
-    - ls -ltr
     - cp -r `readlink result` output
+    - ls -ltr
 
   artifacts:
     paths:
-      - ./output/tarball/*.tar.gz
+      - ./output
 
   only:
     - tags
