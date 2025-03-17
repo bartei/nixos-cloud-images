@@ -18,7 +18,7 @@ build:
   stage: build
 
   script:
-    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#nixosConfigurations.this.config.system.build.qemuImage -L
+    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build nix build .\#tarballImage -L
 
   artifacts:
     paths:
