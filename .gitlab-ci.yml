@@ -1,29 +1,34 @@
 stages:
   - release
-  - build
+#  - build
+
+#release:
+#  image: node:23-bookworm
+#  stage: release
+#  before_script:
+#    - npm install -g semantic-release @semantic-release/gitlab
+#  script:
+#    - semantic-release
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == "main"
 
 release:
-  image: node:23-bookworm
+  image: nixos/nix
   stage: release
-  before_script:
-    - npm install -g semantic-release @semantic-release/gitlab
-  script:
-    - semantic-release
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-
-build:
-  image: nixos/nix
-  stage: build
 
   script:
     - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#tarballImage -L
     - cp -r `readlink result` output
     - ls -ltr
+    - nix -extra-experimental-features nix-command --extra-experimental-features flakes profile install nixpkgs#nodejs
+    - npm npm install -g semantic-release @semantic-release/gitlab
+    - semantic-release
 
   artifacts:
     paths:
       - ./output
 
-  only:
-    - tags
+#  only:
+#    - tags
