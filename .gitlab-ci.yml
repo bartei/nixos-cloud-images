@@ -9,7 +9,7 @@ release:
     - pip install uv
     - uv pip install --system python-semantic-release==10.3.1
   script:
-    - semantic-release version -vv
+    - semantic-release -vv version
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
