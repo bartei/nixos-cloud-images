@@ -26,6 +26,8 @@ release:
 build:
   image: nixos/nix
   stage: build
+  tags:
+    - shell
 
   only:
     refs:
