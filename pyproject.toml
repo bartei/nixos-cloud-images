@@ -57,24 +57,9 @@ ignore_merge_commits = true
 [semantic_release.remote]
 name = "origin"
 type = "gitlab"
-token = { env = "GL_TOKEN" }
 ignore_token_for_push = false
 insecure = false
 
 [semantic_release.publish]
 dist_glob_patterns = ["dist/*"]
 upload_to_vcs_release = true
-
-[tool.semantic_release]
-version_toml = ["pyproject.toml:project.version"]
-patch_without_tag = true
-branch = "main"
-hvcs = "gitlab"
-remove_dist = false
-upload_to_pypi = false
-build_command = "uv build"
-preselease = false
-
-[tool.semantic_release.remote]
-type = "gitlab"
-token = { env = "GL_TOKEN" }
