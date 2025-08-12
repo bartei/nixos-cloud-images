@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.24 (2025-08-12)
+
+### Bug Fixes
+
+- Add tag for build
+  ([`ea55779`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/ea55779080943f380450ba9fd5b8a1bd88a915c8))
+
+
 ## v1.0.23 (2025-08-12)
 
 ### Bug Fixes
