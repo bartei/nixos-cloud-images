@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.17 (2025-08-12)
+
+### Bug Fixes
+
+- Test if we got the keys
+  ([`1bb2a73`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/1bb2a73f64e89166c85de406c38f370d82cea1f3))
+
+
 ## v1.0.16 (2025-08-12)
 
 ### Bug Fixes
