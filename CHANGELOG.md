@@ -2,6 +2,22 @@
 
 <!-- version list -->
 
+## v1.0.21 (2025-08-12)
+
+### Bug Fixes
+
+- Test upload to cloud-images server
+  ([`ba40e8b`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/ba40e8b4fcc100747eaaeb7564d29a1900c309ef))
+
+- Test upload to cloud-images server 2
+  ([`c302480`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/c302480097b518af3618f0450f9e2bd0ca11c95e))
+
+### Chores
+
+- Cleanup
+  ([`5cee716`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/5cee716c55f4be5ecb08e16e473072f96238acdc))
+
+
 ## v1.0.20 (2025-08-12)
 
 ### Bug Fixes
