@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.22 (2025-08-12)
+
+### Bug Fixes
+
+- Test upload to cloud-images server 3
+  ([`54539cb`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/54539cbf7d8ae10ac94a77302d98fb2292662493))
+
+
 ## v1.0.21 (2025-08-12)
 
 ### Bug Fixes
