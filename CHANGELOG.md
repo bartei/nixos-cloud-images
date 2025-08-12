@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.15 (2025-08-12)
+
+### Bug Fixes
+
+- Test build step only for tags
+  ([`d7c4c92`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/d7c4c920cd0b239eee1095ae733b1f0080e0fc1f))
+
+
 ## v1.0.14 (2025-08-12)
 
 ### Bug Fixes
