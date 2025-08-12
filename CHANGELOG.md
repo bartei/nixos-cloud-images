@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.27 (2025-08-12)
+
+### Bug Fixes
+
+- Ssh connection 2
+  ([`7aff356`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/7aff3560e0bd686bb876b0933b8c21e6ffc6d0fa))
+
+
 ## v1.0.26 (2025-08-12)
 
 ### Bug Fixes
