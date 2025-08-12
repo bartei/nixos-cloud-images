@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.14 (2025-08-12)
+
+### Bug Fixes
+
+- Skip for changes to CHANGELOG.md
+  ([`d4a796c`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/d4a796c3b8d29b1aa0f4f858a104219ace04cc31))
+
+
 ## v1.0.13 (2025-08-12)
 
 ### Bug Fixes
