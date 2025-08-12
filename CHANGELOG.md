@@ -2,6 +2,22 @@
 
 <!-- version list -->
 
+## v1.0.26 (2025-08-12)
+
+### Bug Fixes
+
+- Ssh connection
+  ([`fef92d7`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/fef92d77904ba2d6ad3c5387fb166b383ee45462))
+
+### Testing
+
+- Ssh connection
+  ([`0f23a7c`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/0f23a7cfc0897021a8b8ee028e837a1b5e712a4b))
+
+- Ssh connection
+  ([`15b1b8b`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/15b1b8b6133facd60353ea5eb99978c588a573c7))
+
+
 ## v1.0.25 (2025-08-12)
 
 ### Bug Fixes
