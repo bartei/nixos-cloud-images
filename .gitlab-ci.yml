@@ -14,6 +14,7 @@ release:
     - pip install uv
     - uv pip install --system python-semantic-release==10.3.1
   script:
+    - git checkout "$CI_COMMIT_REF_NAME"
     - semantic-release -vv version
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
