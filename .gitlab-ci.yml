@@ -70,7 +70,6 @@ build:
     # Test SSH connection with verbose output
     - ssh -v -o ConnectTimeout=10 default@cloud-images.opt.provvedo.com 'echo "SSH connection test successful"'
 
-
 #    - echo "Build!"
 #    - printenv
 #    - mkdir -p ~/.ssh
