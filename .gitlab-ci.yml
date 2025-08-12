@@ -41,13 +41,18 @@ build:
     GIT_DEPTH: 0
 
   script:
-    - echo "Build!"
+   - echo "Build!"
     - printenv
     - mkdir -p ~/.ssh
     - echo "$PRIVATE_KEY" > ~/.ssh/id_ed25519
     - echo "$PUBLIC_KEY" > ~/.ssh/id_ed25519.pub
     - |
       cat <<EOF > ~/.ssh/config
+      Host cloud-images.opt.provvedo.com
+          UserKnownHostsFile=/dev/null
+          StrictHostKeyChecking=no   
+          IdentityFile ~/.ssh/id_ed25519
+          User default
       Host *
           UserKnownHostsFile=/dev/null
           StrictHostKeyChecking=no   
@@ -57,14 +62,39 @@ build:
     - chmod 644 ~/.ssh/id_ed25519.pub
     - chmod 600 ~/.ssh/config
     - export CURRENT_DATE=$(date +%Y-%m-%d)
-#    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#tarballImage -L --option system-features ""
-    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#nixosConfigurations.this.config.system.build.qemuImage -L
-    - ssh default@cloud-images.opt.provvedo.com mkdir -p /data/cloud-images
-    - ssh default@cloud-images.opt.provvedo.com rm -rf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.*
-    - scp ./result/nixos.qcow2 default@cloud-images.opt.provvedo.com:/data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2
-    - ssh default@cloud-images.opt.provvedo.com ln -sf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2 /data/cloud-images/${IMAGE_NAME}-latest.qcow2
-    - cp -r "$(readlink result)" output
-    - ls -ltr
+    # Debug SSH setup
+    - echo "SSH config contents:"
+    - cat ~/.ssh/config
+    - echo "SSH key fingerprint:"
+    - ssh-keygen -lf ~/.ssh/id_ed25519.pub
+    # Test SSH connection with verbose output
+    - ssh -v -o ConnectTimeout=10 default@cloud-images.opt.provvedo.com 'echo "SSH connection test successful"'
+
+
+#    - echo "Build!"
+#    - printenv
+#    - mkdir -p ~/.ssh
+#    - echo "$PRIVATE_KEY" > ~/.ssh/id_ed25519
+#    - echo "$PUBLIC_KEY" > ~/.ssh/id_ed25519.pub
+#    - |
+#      cat <<EOF > ~/.ssh/config
+#      Host *
+#          UserKnownHostsFile=/dev/null
+#          StrictHostKeyChecking=no
+#          IdentityFile ~/.ssh/id_ed25519
+#      EOF
+#    - chmod 600 ~/.ssh/id_ed25519
+#    - chmod 644 ~/.ssh/id_ed25519.pub
+#    - chmod 600 ~/.ssh/config
+#    - export CURRENT_DATE=$(date +%Y-%m-%d)
+##    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#tarballImage -L --option system-features ""
+#    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#nixosConfigurations.this.config.system.build.qemuImage -L
+#    - ssh default@cloud-images.opt.provvedo.com mkdir -p /data/cloud-images
+#    - ssh default@cloud-images.opt.provvedo.com rm -rf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.*
+#    - scp ./result/nixos.qcow2 default@cloud-images.opt.provvedo.com:/data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2
+#    - ssh default@cloud-images.opt.provvedo.com ln -sf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2 /data/cloud-images/${IMAGE_NAME}-latest.qcow2
+#    - cp -r "$(readlink result)" output
+#    - ls -ltr
 
   artifacts:
     paths:
