@@ -56,7 +56,7 @@ build:
     - chmod 600 ~/.ssh/config
     - export CURRENT_DATE=$(date +%Y-%m-%d)
 #    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#tarballImage -L
-    - nix build .\#nixosConfigurations.this.config.system.build.qemuImage -L
+    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#nixosConfigurations.this.config.system.build.qemuImage -L
     - ssh default@cloud-images.opt.provvedo.com mkdir -p /data/cloud-images
     - ssh default@cloud-images.opt.provvedo.com rm -rf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.*
     - scp ./result/nixos.qcow2 default@cloud-images.opt.provvedo.com:/data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2
