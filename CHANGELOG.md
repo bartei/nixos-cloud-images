@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.19 (2025-08-12)
+
+### Bug Fixes
+
+- Print environment
+  ([`8b8e810`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/8b8e8106e938aac2a2da3c25339e23fd8d8c779e))
+
+
 ## v1.0.18 (2025-08-12)
 
 ### Bug Fixes
