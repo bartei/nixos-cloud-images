@@ -2,6 +2,17 @@
 
 <!-- version list -->
 
+## v1.0.29 (2025-08-12)
+
+### Bug Fixes
+
+- Add ami build
+  ([`fd9bd0c`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/fd9bd0cad3adf99f5486e3f437d3c6b78892be25))
+
+- Add proper name for the nixos release
+  ([`f021f00`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/f021f00adcda899448a3aed2e25223621ac89444))
+
+
 ## v1.0.28 (2025-08-12)
 
 ### Bug Fixes
