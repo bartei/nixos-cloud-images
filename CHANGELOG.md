@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.12 (2025-08-12)
+
+### Bug Fixes
+
+- Workflow rules
+  ([`cd09175`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/cd09175f23d124c3948c4e7914d72a7dbd465b24))
+
+
 ## v1.0.11 (2025-08-12)
 
 ### Bug Fixes
