@@ -20,6 +20,7 @@ release:
   except:
     changes:
       - pyproject.toml
+      - CHANGELOG.md
 
 
 #release:
