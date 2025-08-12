@@ -34,7 +34,7 @@ build:
       - tags
 
   variables:
-    IMAGE_NAME: nixos
+    IMAGE_NAME: nixos-25.05
     PRIVATE_KEY: $ID_ED25519
     PUBLIC_KEY: $ID_ED25519_PUB
     GIT_STRATEGY: clone
