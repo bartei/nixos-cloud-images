@@ -16,11 +16,13 @@ release:
   script:
     - git checkout "$CI_COMMIT_REF_NAME"
     - semantic-release -vv version
+
+  except:
+    changes:
+      - pyproject.toml
+
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-      changes:
-        - "**/*"
-        - "!pyproject.toml"
       when: always
 
 #release:
