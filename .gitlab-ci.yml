@@ -23,7 +23,7 @@ release:
       - pyproject.toml
       - CHANGELOG.md
 
-build:
+qemu:
   image: nixos/nix
   stage: build
   tags:
@@ -34,7 +34,7 @@ build:
       - tags
 
   variables:
-    IMAGE_NAME: nixos-25.05
+    IMAGE_NAME: nixos-24.11
     PRIVATE_KEY: $ID_ED25519
     PUBLIC_KEY: $ID_ED25519_PUB
     GIT_STRATEGY: clone
@@ -70,10 +70,44 @@ build:
     - ssh -F /root/.ssh/config  default@cloud-images.opt.provvedo.com rm -rf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.*
     - scp -F /root/.ssh/config  ./result/nixos.qcow2 default@cloud-images.opt.provvedo.com:/data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2
     - ssh -F /root/.ssh/config  default@cloud-images.opt.provvedo.com ln -sf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2 /data/cloud-images/${IMAGE_NAME}-latest.qcow2
-    - cp -r "$(readlink result)" output
-    - ls -ltr
 
+ami:
+  image: nixos/nix
+  stage: build
+  tags:
+    - shell
 
-  artifacts:
-    paths:
-      - ./output
+  only:
+    refs:
+      - tags
+
+  variables:
+    IMAGE_NAME: nixos-24.11
+    PRIVATE_KEY: $ID_ED25519
+    PUBLIC_KEY: $ID_ED25519_PUB
+    GIT_STRATEGY: clone
+    GIT_DEPTH: 0
+
+  script:
+    - echo "Build!"
+    - printenv
+    - mkdir -p /root/.ssh
+    - echo "$PRIVATE_KEY" > /root/.ssh/id_ed25519
+    - echo "$PUBLIC_KEY" > /root/.ssh/id_ed25519.pub
+    - |
+      cat <<EOF > /root/.ssh/config
+      Host cloud-images.opt.provvedo.com
+          UserKnownHostsFile=/dev/null
+          StrictHostKeyChecking=no   
+          IdentityFile /root/.ssh/id_ed25519
+          User default
+      EOF
+    - chmod 600 /root/.ssh/id_ed25519
+    - chmod 644 /root/.ssh/id_ed25519.pub
+    - chmod 600 /root/.ssh/config
+    - export CURRENT_DATE=$(date +%Y-%m-%d)
+
+    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build .\#ami -L
+    - ssh -F /root/.ssh/config  default@cloud-images.opt.provvedo.com mkdir -p /data/ami
+    - scp -F /root/.ssh/config  $(ls ./result/*.vhd) default@cloud-images.opt.provvedo.com:/data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
+    - ssh -F /root/.ssh/config  default@cloud-images.opt.provvedo.com ln -sf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd /data/cloud-images/${IMAGE_NAME}-latest.vhd
