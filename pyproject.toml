@@ -6,7 +6,7 @@ commit_parser = "conventional"
 logging_use_named_masks = false
 major_on_zero = true
 allow_zero_version = false
-repo_dir = "/"
+repo_dir = "/nixos-cloud-image"
 no_git_verify = false
 tag_format = "v{version}"
 
@@ -64,3 +64,17 @@ insecure = false
 [semantic_release.publish]
 dist_glob_patterns = ["dist/*"]
 upload_to_vcs_release = true
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+patch_without_tag = true
+branch = "main"
+hvcs = "gitlab"
+remove_dist = false
+upload_to_pypi = false
+build_command = "uv build"
+preselease = false
+
+[tool.semantic_release.remote]
+type = "gitlab"
+token = { env = "GL_TOKEN" }
