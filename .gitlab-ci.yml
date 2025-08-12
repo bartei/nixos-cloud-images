@@ -41,7 +41,7 @@ build:
     GIT_DEPTH: 0
 
   script:
-   - echo "Build!"
+    - echo "Build!"
     - printenv
     - mkdir -p ~/.ssh
     - echo "$PRIVATE_KEY" > ~/.ssh/id_ed25519
