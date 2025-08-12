@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.20 (2025-08-12)
+
+### Bug Fixes
+
+- Add more printenv
+  ([`9024f72`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/9024f721dadab830e24778dbe33b12c840963cb0))
+
+
 ## v1.0.19 (2025-08-12)
 
 ### Bug Fixes
