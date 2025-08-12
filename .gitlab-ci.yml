@@ -5,6 +5,11 @@ stages:
 release:
   image: python:3.13
   stage: release
+  variables:
+    TWINE_USERNAME: gitlab-ci-token
+    TWINE_PASSWORD: $GL_TOKEN
+    GIT_STRATEGY: clone
+    GIT_DEPTH: 0
   before_script:
     - pip install uv
     - uv pip install --system python-semantic-release==10.3.1
