@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.16 (2025-08-12)
+
+### Bug Fixes
+
+- Test the generation of a new image
+  ([`2820089`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/2820089dca896acad72d4df123937d4aec33a28b))
+
+
 ## v1.0.15 (2025-08-12)
 
 ### Bug Fixes
