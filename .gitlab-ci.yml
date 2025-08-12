@@ -22,6 +22,17 @@ release:
       - pyproject.toml
       - CHANGELOG.md
 
+build:
+  image: nixos/nix
+  stage: build
+
+  only:
+    refs:
+      - tags
+
+  script:
+    - echo "Build!"
+
 
 #release:
 #  image: nixos/nix
