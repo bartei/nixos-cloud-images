@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.25 (2025-08-12)
+
+### Bug Fixes
+
+- Test new runner
+  ([`46ae30b`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/46ae30bde7f879e4f068ceb0fbb21dd96ac201f3))
+
+
 ## v1.0.24 (2025-08-12)
 
 ### Bug Fixes
