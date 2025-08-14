@@ -26,7 +26,7 @@
           format = "amazon";
           modules = [
           {
-            virtualisation.diskSize = 40 * 1024;
+            virtualisation.diskSize = 8 * 1024;
           }
           ./dockerConfiguration.nix
           ];
