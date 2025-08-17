@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.30 (2025-08-17)
+
+### Bug Fixes
+
+- Manual update
+  ([`c31e071`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/c31e071e268947bc1bad697211a011dc349a83e2))
+
+
 ## v1.0.29 (2025-08-12)
 
 ### Bug Fixes
