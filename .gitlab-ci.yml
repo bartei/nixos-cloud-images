@@ -65,7 +65,7 @@ qemu-25.05:
     - ssh-keygen -lf ~/.ssh/id_ed25519.pub
     # Test SSH connection with verbose output
     - ssh -F /root/.ssh/config -v -o ConnectTimeout=10 default@cloud-images.opt.provvedo.com 'echo "SSH connection test successful"'
-    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build ./${IMAGE_NAME}\#nixosConfigurations.this_25.config.system.build.qemuImage -L
+    - nix --extra-experimental-features nix-command --extra-experimental-features flakes build ./${IMAGE_NAME}\#nixosConfigurations.this.config.system.build.qemuImage -L
     - ssh -F /root/.ssh/config  default@cloud-images.opt.provvedo.com mkdir -p /data/cloud-images
     - ssh -F /root/.ssh/config  default@cloud-images.opt.provvedo.com rm -rf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.*
     - scp -F /root/.ssh/config  ./result/nixos.qcow2 default@cloud-images.opt.provvedo.com:/data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2
