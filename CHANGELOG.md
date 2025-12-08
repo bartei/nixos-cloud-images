@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.32 (2025-12-08)
+
+### Bug Fixes
+
+- Wrong config name for 25.05
+  ([`d44bafe`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/d44bafeed8b7efe46ce38efd957532bb814ef001))
+
+
 ## v1.0.31 (2025-12-08)
 
 ### Bug Fixes
