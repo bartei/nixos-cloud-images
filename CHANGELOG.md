@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.0.31 (2025-12-08)
+
+### Bug Fixes
+
+- Add 25.05
+  ([`11d5fcd`](https://gitlab.provvedo.com/provvedo/nixos-cloud-image/-/commit/11d5fcd199502a8353e88b4eb864ce21973f5793))
+
+
 ## v1.0.30 (2025-08-17)
 
 ### Bug Fixes
