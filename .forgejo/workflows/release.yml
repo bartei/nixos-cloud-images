@@ -1,0 +1,38 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+    # Skip when only the version-bump commit (pyproject.toml + CHANGELOG.md)
+    # changes, otherwise semantic-release would trigger itself in a loop.
+    paths-ignore:
+      - pyproject.toml
+      - CHANGELOG.md
+
+jobs:
+  release:
+    # node:20-bookworm container (Debian) – has git + curl, node for JS actions.
+    runs-on: ubuntu-latest
+    env:
+      # python-semantic-release reads the Forgejo/Gitea token from GITEA_TOKEN.
+      # The token MUST be a personal access token (not the automatic actions
+      # token) so that the tag it pushes triggers the build workflow.
+      GITEA_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Release
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          git config --global --add safe.directory "$PWD"
+          git config --global user.email "actions@forge.provvedo.com"
+          git config --global user.name "forgejo-actions"
+          uvx --from python-semantic-release==10.3.1 semantic-release -vv version

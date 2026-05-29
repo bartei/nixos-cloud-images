@@ -1,0 +1,39 @@
+name: weekly-update
+
+on:
+  # Every Monday at 04:00 UTC. Updates the flake inputs (latest nixpkgs), and
+  # the resulting "fix:" commit triggers release.yml -> build.yml, rebuilding
+  # and publishing fresh images.
+  schedule:
+    - cron: "0 4 * * 1"
+  # Allow manual runs from the Forgejo Actions UI.
+  workflow_dispatch:
+
+jobs:
+  flake-update:
+    # native:host runner – needs the host's Nix to run `nix flake update`.
+    runs-on: native
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # PAT so the pushed commit triggers the release workflow.
+          token: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Update flake inputs
+        run: |
+          git config --global --add safe.directory "$PWD"
+          git config --global user.email "actions@forge.provvedo.com"
+          git config --global user.name "forgejo-actions"
+          nix flake update --flake .
+          nix flake update --flake ./nixos-25.05
+
+      - name: Commit and push
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No flake input changes; nothing to do."
+            exit 0
+          fi
+          git add flake.lock nixos-25.05/flake.lock
+          git commit -m "fix: weekly flake input update"
+          git push origin HEAD:main

@@ -5,8 +5,9 @@ prerelease = false
 
 [semantic_release.remote]
 name = "origin"
-type = "gitlab"
-token = { env = "GL_TOKEN" }
+type = "gitea"
+domain = "forge.provvedo.com"
+token = { env = "GITEA_TOKEN" }
 ignore_token_for_push = false
 insecure = false
 

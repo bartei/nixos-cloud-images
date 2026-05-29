@@ -1,0 +1,70 @@
+name: build
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  SERVER_URL: cloud-images.opt.provvedo.com
+
+jobs:
+  qemu-25-05:
+    # native:host runner – builds with the host's Nix (flakes already enabled).
+    runs-on: native
+    env:
+      IMAGE_NAME: nixos-25.05
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          cat > ~/.ssh/config <<EOF
+          Host ${SERVER_URL}
+              UserKnownHostsFile=/dev/null
+              StrictHostKeyChecking=no
+              IdentityFile ~/.ssh/id_ed25519
+              User default
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Build and publish qcow2
+        run: |
+          export CURRENT_DATE=$(date +%Y-%m-%d)
+          nix build ./${IMAGE_NAME}#nixosConfigurations.this.config.system.build.qemuImage -L
+          ssh -F ~/.ssh/config default@${SERVER_URL} mkdir -p /data/cloud-images
+          ssh -F ~/.ssh/config default@${SERVER_URL} rm -rf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.*
+          scp -F ~/.ssh/config ./result/nixos.qcow2 default@${SERVER_URL}:/data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2
+          ssh -F ~/.ssh/config default@${SERVER_URL} ln -sf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2 /data/cloud-images/${IMAGE_NAME}-latest.qcow2
+
+  ami:
+    runs-on: native
+    env:
+      IMAGE_NAME: nixos-24.11
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          cat > ~/.ssh/config <<EOF
+          Host ${SERVER_URL}
+              UserKnownHostsFile=/dev/null
+              StrictHostKeyChecking=no
+              IdentityFile ~/.ssh/id_ed25519
+              User default
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Build and publish ami vhd
+        run: |
+          export CURRENT_DATE=$(date +%Y-%m-%d)
+          nix build .#ami -L
+          ssh -F ~/.ssh/config default@${SERVER_URL} mkdir -p /data/ami
+          scp -F ~/.ssh/config $(ls ./result/*.vhd) default@${SERVER_URL}:/data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
+          ssh -F ~/.ssh/config default@${SERVER_URL} ln -sf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd /data/cloud-images/${IMAGE_NAME}-latest.vhd
