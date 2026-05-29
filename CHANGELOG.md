@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-05-29)
+
+### Continuous Integration
+
+- Add manual ssh-test workflow to diagnose key authentication
+  ([`3e6b054`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/3e6b05416619681a4ab21c775f02070b01186e9c))
+
+### Features
+
+- Add nixos-25.11 release target and build matrix entry
+  ([`9d43821`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/9d4382176982304f4cca4129529f3bc1370e7c5a))
+
+
 ## v1.1.3 (2026-05-29)
 
 ### Bug Fixes
