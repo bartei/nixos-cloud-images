@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.2 (2026-05-29)
+
+### Bug Fixes
+
+- Split nixos versions into per-version folders and pass ci ssh key via env
+  ([`c98b453`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/c98b453dc07239eb01455a5acd962906a69bb895))
+
+
 ## v1.1.1 (2026-05-29)
 
 ### Bug Fixes
