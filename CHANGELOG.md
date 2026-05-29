@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.0 (2026-05-29)
+
+### Features
+
+- Migrate CI/CD to Forgejo Actions
+  ([`e2cec74`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/e2cec7483d5a987884ac473e9a784fc34ab55f62))
+
+
 ## v1.0.32 (2025-12-08)
 
 ### Bug Fixes
