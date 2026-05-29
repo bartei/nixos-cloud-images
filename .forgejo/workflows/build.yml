@@ -65,5 +65,8 @@ jobs:
           export CURRENT_DATE=$(date +%Y-%m-%d)
           nix build ./${IMAGE_NAME}#ami -L
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} mkdir -p /data/ami
+          # nix artifacts are read-only (0444); scp can't overwrite an existing
+          # one, so remove the dated target first (matches the qcow2 step).
+          ssh -F "$SSH_DIR/config" default@${SERVER_URL} rm -rf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
           scp -F "$SSH_DIR/config" $(ls ./result/*.vhd) default@${SERVER_URL}:/data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} ln -sf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd /data/cloud-images/${IMAGE_NAME}-latest.vhd
