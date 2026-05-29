@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.2.1 (2026-05-29)
+
+### Bug Fixes
+
+- Rm read-only dated vhd before scp so ami publish can overwrite
+  ([`050f2db`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/050f2db5bef96a12a5d579604d6e1354f46f9f69))
+
+
 ## v1.2.0 (2026-05-29)
 
 ### Continuous Integration
