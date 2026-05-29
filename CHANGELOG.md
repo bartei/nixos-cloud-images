@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.1 (2026-05-29)
+
+### Bug Fixes
+
+- Use absolute SSH paths in build workflow
+  ([`7bf40c3`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/7bf40c38aba51ce3ef2c9a1e47f629800e78f385))
+
+
 ## v1.1.0 (2026-05-29)
 
 ### Features
