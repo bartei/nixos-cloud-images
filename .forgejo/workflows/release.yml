@@ -9,6 +9,8 @@ on:
     paths-ignore:
       - pyproject.toml
       - CHANGELOG.md
+  # Allow manual runs from the Forgejo Actions UI (e.g. to test the pipeline).
+  workflow_dispatch:
 
 jobs:
   release:
