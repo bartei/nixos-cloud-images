@@ -9,22 +9,36 @@ env:
   SERVER_URL: cloud-images.opt.provvedo.com
 
 jobs:
-  qemu-25-05:
+  images:
     # native:host runner – builds with the host's Nix (flakes already enabled).
     runs-on: native
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - "24.11"
+          - "25.05"
     env:
-      IMAGE_NAME: nixos-25.05
+      IMAGE_NAME: nixos-${{ matrix.version }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup SSH
+        # Pass the multiline key via env (not inline interpolation into the
+        # script) so its PEM line structure is preserved; printf guarantees the
+        # trailing newline OpenSSH requires.
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           # $HOME is unset on the native runner, so keep everything under the
           # workspace with absolute paths instead of relying on ~.
           SSH_DIR="$(pwd)/.ci-ssh"
           mkdir -p "$SSH_DIR"
-          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > "$SSH_DIR/id_ed25519"
+          printf '%s\n' "$SSH_PRIVATE_KEY" > "$SSH_DIR/id_ed25519"
           chmod 600 "$SSH_DIR/id_ed25519"
+          # Fail fast with a clear error if the key is malformed, and
+          # materialise the matching public key next to it.
+          ssh-keygen -y -f "$SSH_DIR/id_ed25519" > "$SSH_DIR/id_ed25519.pub"
           cat > "$SSH_DIR/config" <<EOF
           Host ${SERVER_URL}
               UserKnownHostsFile=/dev/null
@@ -40,37 +54,15 @@ jobs:
           export CURRENT_DATE=$(date +%Y-%m-%d)
           nix build ./${IMAGE_NAME}#nixosConfigurations.this.config.system.build.qemuImage -L
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} mkdir -p /data/cloud-images
-          ssh -F "$SSH_DIR/config" default@${SERVER_URL} rm -rf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.*
+          ssh -F "$SSH_DIR/config" default@${SERVER_URL} rm -rf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2
           scp -F "$SSH_DIR/config" ./result/nixos.qcow2 default@${SERVER_URL}:/data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} ln -sf /data/cloud-images/${IMAGE_NAME}-${CURRENT_DATE}.qcow2 /data/cloud-images/${IMAGE_NAME}-latest.qcow2
-
-  ami:
-    runs-on: native
-    env:
-      IMAGE_NAME: nixos-24.11
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup SSH
-        run: |
-          SSH_DIR="$(pwd)/.ci-ssh"
-          mkdir -p "$SSH_DIR"
-          printf '%s\n' "${{ secrets.SSH_PRIVATE_KEY }}" > "$SSH_DIR/id_ed25519"
-          chmod 600 "$SSH_DIR/id_ed25519"
-          cat > "$SSH_DIR/config" <<EOF
-          Host ${SERVER_URL}
-              UserKnownHostsFile=/dev/null
-              StrictHostKeyChecking=no
-              IdentityFile $SSH_DIR/id_ed25519
-              User default
-          EOF
-          chmod 600 "$SSH_DIR/config"
 
       - name: Build and publish ami vhd
         run: |
           SSH_DIR="$(pwd)/.ci-ssh"
           export CURRENT_DATE=$(date +%Y-%m-%d)
-          nix build .#ami -L
+          nix build ./${IMAGE_NAME}#ami -L
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} mkdir -p /data/ami
           scp -F "$SSH_DIR/config" $(ls ./result/*.vhd) default@${SERVER_URL}:/data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} ln -sf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd /data/cloud-images/${IMAGE_NAME}-latest.vhd
