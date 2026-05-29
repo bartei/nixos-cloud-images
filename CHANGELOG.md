@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v1.1.3 (2026-05-29)
+
+### Bug Fixes
+
+- Mock commit
+  ([`4107ad0`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/4107ad04a03e07be0ac6c609819e374a92ab431f))
+
+### Build System
+
+- Relock flakes against release branches to stop per-build relocking
+  ([`33d88a9`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/33d88a9bc82184e3978b694fdcabb919355b0b7a))
+
+### Continuous Integration
+
+- Add manual workflow_dispatch trigger to release
+  ([`df74316`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/df743161f4be0fcedf042a9817b8533f49152506))
+
+
 ## v1.1.2 (2026-05-29)
 
 ### Bug Fixes
