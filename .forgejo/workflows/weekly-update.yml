@@ -27,6 +27,7 @@ jobs:
           git config --global user.name "forgejo-actions"
           nix flake update --flake ./nixos-25.05
           nix flake update --flake ./nixos-25.11
+          nix flake update --flake ./nixos-26.05
 
       - name: Commit and push
         run: |
@@ -34,6 +35,6 @@ jobs:
             echo "No flake input changes; nothing to do."
             exit 0
           fi
-          git add nixos-25.05/flake.lock nixos-25.11/flake.lock
+          git add nixos-25.05/flake.lock nixos-25.11/flake.lock nixos-26.05/flake.lock
           git commit -m "fix: weekly flake input update"
           git push origin HEAD:main

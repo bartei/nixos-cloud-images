@@ -18,6 +18,7 @@ jobs:
         version:
           - "25.05"
           - "25.11"
+          - "26.05"
     env:
       IMAGE_NAME: nixos-${{ matrix.version }}
     steps:
