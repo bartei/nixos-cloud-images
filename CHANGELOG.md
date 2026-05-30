@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.0 (2026-05-30)
+
+### Features
+
+- Add nixos-26.05 release target and build matrix entry
+  ([`078e070`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/078e070e9567ba94270c2f7f30b884373c58754d))
+
+
 ## v1.3.0 (2026-05-30)
 
 ### Features
