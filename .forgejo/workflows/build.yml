@@ -72,3 +72,20 @@ jobs:
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} rm -rf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
           scp -F "$SSH_DIR/config" "$VHD" default@${SERVER_URL}:/data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} ln -sf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd /data/cloud-images/${IMAGE_NAME}-latest.vhd
+
+      - name: Build and publish lxc template
+        run: |
+          SSH_DIR="$(pwd)/.ci-ssh"
+          # Not every version has an lxc template; skip the ones that don't.
+          if [ ! -d "./lxc/${IMAGE_NAME}" ]; then
+            echo "No lxc template for ${IMAGE_NAME}; skipping."
+            exit 0
+          fi
+          export CURRENT_DATE=$(date +%Y-%m-%d)
+          nix build ./lxc/${IMAGE_NAME}#image -L
+          TARBALL=$(find -L ./result/tarball -type f -name '*.tar.xz' | head -1)
+          ssh -F "$SSH_DIR/config" default@${SERVER_URL} mkdir -p /data/lxc-templates
+          # nix artifacts are read-only (0444); remove the dated target before scp.
+          ssh -F "$SSH_DIR/config" default@${SERVER_URL} rm -rf /data/lxc-templates/${IMAGE_NAME}-${CURRENT_DATE}.tar.xz
+          scp -F "$SSH_DIR/config" "$TARBALL" default@${SERVER_URL}:/data/lxc-templates/${IMAGE_NAME}-${CURRENT_DATE}.tar.xz
+          ssh -F "$SSH_DIR/config" default@${SERVER_URL} ln -sf /data/lxc-templates/${IMAGE_NAME}-${CURRENT_DATE}.tar.xz /data/lxc-templates/${IMAGE_NAME}-latest.tar.xz
