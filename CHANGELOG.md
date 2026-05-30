@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.4.1 (2026-05-30)
+
+### Bug Fixes
+
+- Cleanup unnecessary cicd
+  ([`322a61a`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/322a61a384bc834a2d8ee0317af5c7476dacdf68))
+
+
 ## v1.4.0 (2026-05-30)
 
 ### Features
