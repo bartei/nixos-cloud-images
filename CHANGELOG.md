@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.6.1 (2026-05-30)
+
+### Bug Fixes
+
+- Publish ami -latest symlink under /data/ami instead of cloud-images
+  ([`09e8b85`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/09e8b8524d0c85d0f1fd5b947322cdc7e9edfd56))
+
+
 ## v1.6.0 (2026-05-30)
 
 ### Features
