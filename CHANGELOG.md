@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.3.0 (2026-05-30)
+
+### Features
+
+- Drop nixos-24.11 and build version-correct ami via native image framework
+  ([`bf524fe`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/bf524fea3b186804af6830aed6b7f53f27827f53))
+
+
 ## v1.2.1 (2026-05-29)
 
 ### Bug Fixes
