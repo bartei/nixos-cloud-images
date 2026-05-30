@@ -1,13 +1,13 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
-    nixos-generators.url = "github:nix-community/nixos-generators";
   };
-  outputs = { self, nixpkgs, nixos-generators, ... }:
+  outputs = { self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
     in
     rec {
+
         dockerImage = nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [
@@ -20,18 +20,15 @@
           fileName = "docker-${system}";
         };
 
-        ami = nixos-generators.nixosGenerate {
+        # Amazon/EC2 image via the native nixpkgs image framework (nixos-generators
+        # was deprecated in 25.05). Tracks this folder's nixpkgs; outputs a .vhd.
+        ami = (nixpkgs.lib.nixosSystem {
           inherit system;
-          format = "amazon";
           modules = [
-          {
-            virtualisation.diskSize = 8 * 1024;
-          }
-          ./dockerConfiguration.nix
+            ./dockerConfiguration.nix
+            { image.modules.amazon.virtualisation.diskSize = 8 * 1024; }
           ];
-        };
-
-        amazonImage = dockerImage.config.system.build;
+        }).config.system.build.images.amazon;
 
         nixosConfigurations = {
         this = nixpkgs.lib.nixosSystem {

@@ -16,7 +16,6 @@ jobs:
       fail-fast: false
       matrix:
         version:
-          - "24.11"
           - "25.05"
           - "25.11"
     env:
@@ -64,9 +63,11 @@ jobs:
           SSH_DIR="$(pwd)/.ci-ssh"
           export CURRENT_DATE=$(date +%Y-%m-%d)
           nix build ./${IMAGE_NAME}#ami -L
+          # The image framework may place the .vhd in a subdirectory of ./result.
+          VHD=$(find -L ./result -type f -name '*.vhd' | head -1)
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} mkdir -p /data/ami
           # nix artifacts are read-only (0444); scp can't overwrite an existing
           # one, so remove the dated target first (matches the qcow2 step).
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} rm -rf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
-          scp -F "$SSH_DIR/config" $(ls ./result/*.vhd) default@${SERVER_URL}:/data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
+          scp -F "$SSH_DIR/config" "$VHD" default@${SERVER_URL}:/data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} ln -sf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd /data/cloud-images/${IMAGE_NAME}-latest.vhd

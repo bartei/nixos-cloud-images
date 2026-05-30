@@ -25,7 +25,6 @@ jobs:
           git config --global --add safe.directory "$PWD"
           git config --global user.email "actions@forge.provvedo.com"
           git config --global user.name "forgejo-actions"
-          nix flake update --flake ./nixos-24.11
           nix flake update --flake ./nixos-25.05
           nix flake update --flake ./nixos-25.11
 
@@ -35,6 +34,6 @@ jobs:
             echo "No flake input changes; nothing to do."
             exit 0
           fi
-          git add nixos-24.11/flake.lock nixos-25.05/flake.lock nixos-25.11/flake.lock
+          git add nixos-25.05/flake.lock nixos-25.11/flake.lock
           git commit -m "fix: weekly flake input update"
           git push origin HEAD:main
