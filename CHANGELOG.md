@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.0 (2026-05-30)
+
+### Features
+
+- Build and publish lxc templates to cloud-images lxc-templates
+  ([`2d086f4`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/2d086f4894c895bd30593fe3a751300de679e27a))
+
+
 ## v1.4.1 (2026-05-30)
 
 ### Bug Fixes
