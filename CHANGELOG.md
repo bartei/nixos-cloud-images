@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.6.0 (2026-05-30)
+
+### Features
+
+- Restructure images into vm/ami/lxc trees and add awscli2 to ami
+  ([`3ec3638`](https://forge.provvedo.com/provvedo/nixos-cloud-image/commit/3ec36384e03d5e3ebbdcae3298687ba0a7d18630))
+
+
 ## v1.5.0 (2026-05-30)
 
 ### Features
