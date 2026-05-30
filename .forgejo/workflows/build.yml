@@ -80,7 +80,7 @@ jobs:
           # one, so remove the dated target first (matches the qcow2 step).
           ssh -F "$SSH_DIR/config" default@${SERVER_URL} rm -rf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
           scp -F "$SSH_DIR/config" "$VHD" default@${SERVER_URL}:/data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd
-          ssh -F "$SSH_DIR/config" default@${SERVER_URL} ln -sf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd /data/cloud-images/${IMAGE_NAME}-latest.vhd
+          ssh -F "$SSH_DIR/config" default@${SERVER_URL} ln -sf /data/ami/${IMAGE_NAME}-${CURRENT_DATE}.vhd /data/ami/${IMAGE_NAME}-latest.vhd
 
       - name: Build and publish lxc template
         run: |
