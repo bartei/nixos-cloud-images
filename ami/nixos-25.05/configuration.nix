@@ -12,6 +12,7 @@
     mc
     gettext
     openssl
+    awscli2
   ];
 
   virtualisation.docker.enable = true;
