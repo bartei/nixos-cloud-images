@@ -145,15 +145,36 @@ per run; keep the pile small). GitHub only runs scheduled workflows from the
 default branch and disables them after 60 days without repository activity on a
 public repo; the monthly commit itself counts as activity.
 
-### Two forges, one `main` — a conflict to resolve before enabling both
-If Forgejo `release.yml` and GitHub `release.yml` both run semantic-release on the
-same `main`, each creates its own version-bump commit and tag, and the two `main`
-branches diverge. **Exactly one forge must own releases.** This design makes GitHub
-self-sufficient and does not touch Forgejo; the recommended follow-up is to make
-GitHub the source of truth and either disable the Forgejo `release.yml`/`update.yml`
-or turn the Forgejo repo into a pull mirror of GitHub. The Forgejo `build.yml` (scp
-to the private image server) can stay if those tags keep arriving via the mirror.
-Decision deferred to the owner; tracked in the todo.
+### Two forges, one `main` — decision (2026-10-18)
+Owner's requirement: two independent build pipelines on the same code. GitHub
+builds for GitHub Releases; Forgejo (`forge.provvedo.com`) builds on its native
+runner and publishes to the private image server, as it always did. The hazard was
+two semantic-release instances writing version-bump commits to the same `main`,
+which diverges the histories after the first release.
+
+Resolution: **GitHub is the only writer to `main`** (monthly flake update, changelog
+commit, tags). A `mirror` job in `release.yml` pushes `main` and the tag created in
+that run to Forgejo over SSH with a write-enabled deploy key
+(`FORGEJO_DEPLOY_KEY` secret; host key pinned in the workflow). Forgejo keeps
+`build.yml`, whose `v*` tag trigger fires on the mirrored tag; its `release.yml`,
+`update.yml` and the now-unused `pyproject.toml` semantic-release config were
+removed. Forgejo `main` is receive-only. Pushing only the new tag (not `--tags`)
+avoids re-triggering builds for every historical tag.
+
+Until the secret exists the mirror job prints a notice and does nothing, so the
+GitHub pipeline is unaffected by Forgejo's availability; Forgejo's build simply
+depends on GitHub having released.
+
+Rejected: Forgejo as a pull mirror of GitHub (mirror repos are read-only and
+Forgejo Actions do not reliably fire on mirror syncs). Rejected: fully separate
+repositories with separate version histories, which the owner offered; it would
+need manual porting of every change and lose the shared tags.
+
+Initial sync, done by hand on 2026-10-18 from this machine: push `main` (with the
+Forgejo workflows already removed, so no release run fires there) and the single
+tag `v1.6.4` (one build run on the native runner). Tags `v1.6.2` and `v1.6.3` were
+deliberately not pushed: v1.6.2 has no assets and v1.6.3 is superseded, and each
+would trigger a full build on Forgejo.
 
 ### Licence: GPL-3.0-or-later
 The request was "GPL"; version 3 is the current GPL, and "or later" is the FSF's
@@ -172,7 +193,10 @@ in the README.
 
 ## Files touched
 
-- `.github/workflows/release.yml` — new.
+- `.github/workflows/release.yml` — new; later gained the `mirror` job.
+- Removed: `.forgejo/workflows/release.yml`, `.forgejo/workflows/update.yml` (+ its
+  design/todo), `pyproject.toml`. Kept: `.forgejo/workflows/build.yml` (header
+  comment added).
 - `.github/semantic-release.toml` — new.
 - `README.md`, `LICENSE`, `CONTRIBUTING.md` — new.
 - `.github/github_design.md`, `.github/github_todo.md` — these docs.
@@ -191,7 +215,8 @@ Blast radius: GitHub only. Each release runs 7 image builds (≈15–30 min each
 parallel) and attaches ≈7 assets plus checksums. No effect on the Forgejo pipeline
 or the private image server, apart from the divergence risk described above.
 
-Secrets: none. `GITHUB_TOKEN` with `permissions: contents: write`.
+Secrets: `FORGEJO_DEPLOY_KEY` (private half of a write-enabled Forgejo deploy key) for
+the mirror job; everything else uses `GITHUB_TOKEN` with `permissions: contents: write`.
 
 ## Verification
 

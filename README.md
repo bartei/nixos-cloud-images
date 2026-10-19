@@ -177,7 +177,10 @@ the pipeline first runs `nix flake update` in every image and commits the result
 a `fix(deps)` change, so a fresh patch release goes out with current `nixpkgs`.
 
 The pipeline lives in [`.github/workflows/release.yml`](.github/workflows/release.yml);
-its design notes are in [`.github/github_design.md`](.github/github_design.md).
+its design notes are in [`.github/github_design.md`](.github/github_design.md). The
+same tags are mirrored to the maintainer's Forgejo, whose own workflow under
+`.forgejo/` rebuilds the images for a private image server; that pipeline is
+independent of the GitHub Release.
 
 ## Contributing
 

@@ -9,12 +9,10 @@ on:
   push:
     branches:
       - main
-    # The version-bump commit touches only CHANGELOG.md; ignoring it (and
-    # pyproject.toml, as the Forgejo pipeline does) keeps the pipeline from
-    # feeding itself.
+    # The version-bump commit touches only CHANGELOG.md; ignoring it keeps the
+    # pipeline from feeding itself.
     paths-ignore:
       - CHANGELOG.md
-      - pyproject.toml
   schedule:
     # 1st of every month, 03:00 UTC: refresh nixpkgs pins, then release.
     - cron: "0 3 1 * *"
@@ -118,6 +116,51 @@ jobs:
           )
           echo "matrix=${matrix}"
           echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
+
+  mirror:
+    name: mirror to forgejo
+    needs: release
+    # Forgejo (forge.provvedo.com) runs its own build.yml on v* tags and publishes
+    # to the private image server. It never writes to main; this job is the only
+    # thing that pushes there. Explicit status function: see `build` below.
+    if: ${{ !cancelled() && needs.release.result == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      FORGEJO_DEPLOY_KEY: ${{ secrets.FORGEJO_DEPLOY_KEY }}
+      FORGEJO_URL: ssh://forgejo@forge.provvedo.com:2222/provvedo/nixos-cloud-image.git
+      RELEASED: ${{ needs.release.outputs.released }}
+      TAG: ${{ needs.release.outputs.tag }}
+    steps:
+      - name: No deploy key configured
+        if: env.FORGEJO_DEPLOY_KEY == ''
+        run: echo "::notice::FORGEJO_DEPLOY_KEY secret is not set; skipping the Forgejo mirror."
+
+      - uses: actions/checkout@v5
+        if: env.FORGEJO_DEPLOY_KEY != ''
+        with:
+          # Tip of main (includes the version-bump commit) and all tags.
+          ref: main
+          fetch-depth: 0
+
+      - name: Push main and the new tag to Forgejo
+        if: env.FORGEJO_DEPLOY_KEY != ''
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$FORGEJO_DEPLOY_KEY" > ~/.ssh/forgejo_deploy
+          chmod 600 ~/.ssh/forgejo_deploy
+          # Pinned host key (ssh-keyscan -p 2222 forge.provvedo.com, 2026-10-18).
+          cat > ~/.ssh/known_hosts <<'EOF'
+          [forge.provvedo.com]:2222 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDVPdhlSXMhD/4BOFnfzT1XHjzrHb06O/d/29DSnzScoGWEcWvG0cOXKwyjdOfbVg93CcCYtRhTNjzAJKzLBjh1kY0wT7TxyRNnzvHxR2wONMTY2gUSm2H9LADp92SivqGj9dLZvjZuKokVMej2T/+WG43AHn4HP5OiuwvVraULoq4xHCFPQ6J5xfkpqGNWADuXJS91ol7SpU/wKLWF37yulG+Z1fRi+4jp7aRYRKNtgXkA4dku6dFezskuP2RGSs9pfe/pw46XTRlSF33kgZEN1eS/KCryVbsoWFD9BjptQGKU0l8Vl7ao2L8QKr/zUZV0qa7GYxPqh0uhx7Ist5ylH2UVGEACwPMdojCECwQHHlWDORlhvRejgHqsx6/qmRXHijDeCKuyeysfj1H5OtmaNrrptFaEIsxfV2yBLpqP/6muj8ml5fecp9JHIXRQvzHt7j3ZU86aA1RypT2dGfhg/doFIDmdJ8KaPjIjjocz8SdW+R5kEZA/sCFWmPsFtj8R/dbtjxxpJhp8rIRXq2o7KJd3n/XkLS4GcKftZNgnNibZSOA5n8BYhpEQy7snElABVFH/leY7iGt9pkStXQgOM/C15duRIwVwXd9ZwMrSO7+x6Iio3/AFdocJoRijo85tErSXaC2vkPZL6ucdTQZKhW4UPXtpZLczeXSD8PJIfQ==
+          EOF
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/forgejo_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+          git push "$FORGEJO_URL" HEAD:refs/heads/main
+          if [ "$RELEASED" = "true" ]; then
+            # Only the tag made in this run: older tags would re-trigger old builds.
+            git push "$FORGEJO_URL" "refs/tags/${TAG}"
+          else
+            echo "No release in this run; main synced, no tag to push."
+          fi
 
   build:
     name: nixos-${{ matrix.version }} ${{ matrix.kind }}

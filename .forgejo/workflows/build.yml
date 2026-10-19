@@ -1,5 +1,13 @@
 name: build
 
+# Builds every image on the native runner and publishes it to the private image
+# server (cloud-images.opt.provvedo.com, public face cloud-images.provvedo.com).
+# Triggered by v* tags. Tags are not created here: the GitHub repository
+# github.com/bartei/nixos-cloud-images runs semantic-release and the monthly
+# nixpkgs update, and its workflow mirrors main plus each new tag to this repo.
+# Forgejo main is receive-only; do not push to it directly or the mirror push
+# will stop fast-forwarding. See .github/github_design.md, "Two forges".
+
 on:
   push:
     tags:
