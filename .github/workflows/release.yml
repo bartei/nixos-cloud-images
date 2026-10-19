@@ -1,0 +1,193 @@
+name: release
+
+# Single pipeline: (monthly) refresh flake.lock → semantic-release tags and
+# creates the GitHub Release → one build job per image uploads its asset.
+# Chained in one workflow because pushes/tags made with GITHUB_TOKEN never
+# trigger other workflows. See .github/github_design.md.
+
+on:
+  push:
+    branches:
+      - main
+    # The version-bump commit touches only CHANGELOG.md; ignoring it (and
+    # pyproject.toml, as the Forgejo pipeline does) keeps the pipeline from
+    # feeding itself.
+    paths-ignore:
+      - CHANGELOG.md
+      - pyproject.toml
+  schedule:
+    # 1st of every month, 03:00 UTC: refresh nixpkgs pins, then release.
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+    inputs:
+      flake_update:
+        description: "Run nix flake update before releasing (what the monthly schedule does)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# Never let two releases interleave; the second waits for the first.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  NIX_CONFIG: |
+    experimental-features = nix-command flakes
+    build-dir = /nix/build
+    system-features = nixos-test benchmark big-parallel kvm
+
+jobs:
+  update:
+    name: flake update
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.flake_update)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: cachix/install-nix-action@v31
+
+      - name: Update flake.lock in every image flake
+        run: |
+          set -euo pipefail
+          for dir in vm/*/ ami/*/ lxc/*/; do
+            [ -f "${dir}flake.nix" ] || continue
+            echo "==> ${dir}"
+            ( cd "${dir}" && nix flake update )
+          done
+
+      - name: Commit and push if anything changed
+        run: |
+          set -euo pipefail
+          if [ -z "$(git status --porcelain -- '*/*/flake.lock')" ]; then
+            echo "No flake.lock changes; nothing to do."
+            exit 0
+          fi
+          git status --short
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- '*/*/flake.lock'
+          # `fix` so semantic-release cuts a patch release (chore would not bump).
+          git commit -m "fix(deps): monthly nixpkgs flake.lock update ($(date +%Y-%m-%d))"
+          git push origin HEAD:main
+
+  release:
+    name: semantic release
+    needs: update
+    # Run whether `update` ran or was skipped, but not if it failed.
+    if: ${{ !cancelled() && (needs.update.result == 'success' || needs.update.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    outputs:
+      released: ${{ steps.semrel.outputs.released }}
+      tag: ${{ steps.semrel.outputs.tag }}
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Tip of main, not github.sha: picks up the commit `update` just pushed.
+          ref: main
+          fetch-depth: 0
+
+      - name: Version, changelog, tag and GitHub Release
+        id: semrel
+        uses: python-semantic-release/python-semantic-release@v10.3.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          config_file: .github/semantic-release.toml
+          git_committer_name: "github-actions[bot]"
+          git_committer_email: "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Plan build matrix from the image directories
+        id: plan
+        run: |
+          set -euo pipefail
+          matrix=$(
+            for f in vm/nixos-*/flake.nix ami/nixos-*/flake.nix lxc/nixos-*/flake.nix; do
+              [ -f "$f" ] || continue
+              kind=${f%%/*}
+              version=${f#*/nixos-}; version=${version%/flake.nix}
+              printf '{"kind":"%s","version":"%s"}\n' "$kind" "$version"
+            done | jq -cs '{include: .}'
+          )
+          echo "matrix=${matrix}"
+          echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: nixos-${{ matrix.version }} ${{ matrix.kind }}
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.release.outputs.matrix) }}
+    env:
+      TAG: ${{ needs.release.outputs.tag }}
+      KIND: ${{ matrix.kind }}
+      VERSION: ${{ matrix.version }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release.outputs.tag }}
+
+      - name: Enable KVM for the Nix build users
+        # make-disk-image runs the installer in a QEMU VM and requires the `kvm`
+        # system feature. /dev/kvm exists on GitHub's Linux runners but is
+        # 0660 root:kvm; the nixbld users need it world-accessible.
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          ls -l /dev/kvm
+
+      - name: Reclaim runner disk for /nix
+        # Must run before Nix is installed. Synchronous purge: the disk image
+        # build needs the space from the first second.
+        uses: wimpysworld/nothing-but-nix@v10
+        with:
+          witness-carnage: true
+
+      - uses: cachix/install-nix-action@v31
+
+      - name: Build image
+        run: |
+          set -euo pipefail
+          nix build "./${KIND}/nixos-${VERSION}#image" -L
+
+      - name: Package asset
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          name="nixos-${VERSION}-${KIND}"
+          case "$KIND" in
+            vm)
+              # Built with format = "qcow2-compressed": ship as-is.
+              src=$(find -L ./result -type f -name '*.qcow2' | head -1)
+              cp "$src" "dist/${name}.qcow2"
+              ;;
+            ami)
+              # Dynamic VHD, uncompressed. GitHub caps release assets at 2 GiB.
+              src=$(find -L ./result -type f -name '*.vhd' | head -1)
+              zstd -T0 -15 "$src" -o "dist/${name}.vhd.zst"
+              ;;
+            lxc)
+              src=$(find -L ./result/tarball -type f -name '*.tar.xz' | head -1)
+              cp "$src" "dist/${name}.tar.xz"
+              ;;
+            *)
+              echo "unknown kind: $KIND" >&2; exit 1
+              ;;
+          esac
+          chmod 644 dist/*
+          ( cd dist && for f in *; do sha256sum "$f" > "$f.sha256"; done )
+          ls -l dist
+
+      - name: Upload to the GitHub Release
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" dist/* --clobber

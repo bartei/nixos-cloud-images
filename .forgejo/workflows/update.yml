@@ -1,0 +1,53 @@
+name: update
+
+# Monthly nixpkgs bump. Only refreshes flake.lock files and commits them; the
+# existing chain does the rest: the push to main runs release.yml, which tags a
+# patch version, and the tag runs build.yml, which builds and uploads images.
+# See update_design.md.
+
+on:
+  schedule:
+    # 1st of every month, 03:00 UTC.
+    - cron: "0 3 1 * *"
+  # Allow manual runs from the Forgejo Actions UI.
+  workflow_dispatch:
+
+jobs:
+  flake-update:
+    # native:host runner – has Nix with flakes enabled (same as build.yml).
+    runs-on: native
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Must be the personal access token, not the automatic actions token:
+          # only a PAT-authenticated push triggers release.yml (see release.yml).
+          # actions/checkout persists this credential, so `git push` below uses it.
+          token: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Update flake.lock in every image flake
+        run: |
+          set -euo pipefail
+          for dir in vm/*/ ami/*/ lxc/*/; do
+            [ -f "${dir}flake.nix" ] || continue
+            echo "==> ${dir}"
+            # cd + bare `nix flake update`: the path/--flake argument form differs
+            # between Nix versions and the runner's Nix is not pinned.
+            ( cd "${dir}" && nix flake update )
+          done
+
+      - name: Commit and push if anything changed
+        run: |
+          set -euo pipefail
+          if [ -z "$(git status --porcelain -- '*/*/flake.lock')" ]; then
+            echo "No flake.lock changes; nothing to do."
+            exit 0
+          fi
+          git status --short
+          # $HOME is unset on the native runner; configure identity repo-locally.
+          git config user.email "actions@forge.provvedo.com"
+          git config user.name "forgejo-actions"
+          git add -- '*/*/flake.lock'
+          # `fix` (not `chore`): with the default semantic-release parser only
+          # fix/feat bump the version, and no bump means no tag and no build.
+          git commit -m "fix(deps): monthly nixpkgs flake.lock update ($(date +%Y-%m-%d))"
+          git push origin HEAD:main
