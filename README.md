@@ -33,17 +33,37 @@ but no longer receive updates.
 
 ## Download
 
-Grab assets from the [latest release](https://github.com/bartei/nixos-cloud-images/releases/latest).
-Stable URLs for scripts:
+Grab assets from the [latest release](https://github.com/bartei/nixos-cloud-images/releases/latest),
+or use the stable links below. They always resolve to the newest release, so they are
+safe to paste into scripts, Proxmox download dialogs or Terraform. Append `.sha256`
+to any of them for the matching checksum file.
+
+```text
+# NixOS 26.05
+https://github.com/bartei/nixos-cloud-images/releases/latest/download/nixos-26.05-vm.qcow2
+https://github.com/bartei/nixos-cloud-images/releases/latest/download/nixos-26.05-ami.vhd.zst
+https://github.com/bartei/nixos-cloud-images/releases/latest/download/nixos-26.05-lxc.tar.xz
+
+# NixOS 25.11
+https://github.com/bartei/nixos-cloud-images/releases/latest/download/nixos-25.11-vm.qcow2
+https://github.com/bartei/nixos-cloud-images/releases/latest/download/nixos-25.11-ami.vhd.zst
+
+# NixOS 25.05 (end of life upstream; rebuilt, no longer updated)
+https://github.com/bartei/nixos-cloud-images/releases/latest/download/nixos-25.05-vm.qcow2
+https://github.com/bartei/nixos-cloud-images/releases/latest/download/nixos-25.05-ami.vhd.zst
+```
+
+Download and verify one image:
 
 ```sh
-# Latest release of a given asset
 curl -LO https://github.com/bartei/nixos-cloud-images/releases/latest/download/nixos-26.05-vm.qcow2
 curl -LO https://github.com/bartei/nixos-cloud-images/releases/latest/download/nixos-26.05-vm.qcow2.sha256
 sha256sum -c nixos-26.05-vm.qcow2.sha256
 ```
 
-Replace `latest` with a tag such as `v1.6.1` to pin a specific release.
+To pin a specific release instead of following the latest, replace `latest/download`
+with `download/<tag>`, for example
+`https://github.com/bartei/nixos-cloud-images/releases/download/v1.6.4/nixos-26.05-vm.qcow2`.
 
 ## Using the images
 
