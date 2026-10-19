@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.6.3 (2026-10-19)
+
+### Bug Fixes
+
+- **ci**: Run image builds when the scheduled update job is skipped
+  ([`43d62f1`](https://github.com/bartei/nixos-cloud-images/commit/43d62f194104ff0e224052d711ac7bab43da7cc9))
+
+
 ## v1.6.2 (2026-10-19)
 
 ### Bug Fixes
