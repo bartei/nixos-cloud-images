@@ -120,6 +120,17 @@ steps:
   `DeterminateSystems/nix-installer-action`, which now defaults to the Determinate
   Nix distribution; upstream Nix is the smaller surprise for contributors.
 
+### Job conditions must carry an explicit status function
+First run on GitHub (run 1, 2026-10-18): `release` created `v1.6.2` and the
+Release, but every `build` job was *skipped*. Cause: when a job's `if` has no
+status-check function, GitHub prepends an implicit `success()`, and the runner
+evaluates that as false if **any** job in the transitive `needs` chain was skipped,
+not only a direct dependency (actions/runner issue #491). On push events `update`
+is skipped by design, `release` survives because its condition starts with
+`!cancelled()`, and `build` fell over. Fix: `build` now uses
+`!cancelled() && needs.release.result == 'success' && needs.release.outputs.released == 'true'`.
+Rule for this workflow: every job downstream of `update` spells out its condition.
+
 ### Monthly cadence
 Same `0 3 1 * *` as the Forgejo `update.yml`, for the same reason (one image set
 per run; keep the pile small). GitHub only runs scheduled workflows from the

@@ -19,7 +19,7 @@
 
 ## Phase 4 — roll out
 - [ ] Decide which forge owns releases; disable the other's release/update workflows
-- [ ] Push main and tags to the GitHub remote
+- [x] Push main and tags to the GitHub remote
 - [ ] First run: tag, Release and all assets present
 - [ ] Manual dispatch with flake_update exercises the monthly path
 - [ ] Boot a downloaded qcow2 in QEMU

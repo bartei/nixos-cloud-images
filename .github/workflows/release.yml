@@ -119,7 +119,11 @@ jobs:
   build:
     name: nixos-${{ matrix.version }} ${{ matrix.kind }}
     needs: release
-    if: needs.release.outputs.released == 'true'
+    # Explicit status function: without one GitHub adds an implicit success()
+    # that is false whenever any job earlier in the needs chain was skipped
+    # (here: `update` on push events), and the build would be skipped even
+    # though `release` succeeded. See actions/runner#491.
+    if: ${{ !cancelled() && needs.release.result == 'success' && needs.release.outputs.released == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
