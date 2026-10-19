@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v1.6.4 (2026-10-19)
+
+### Bug Fixes
+
+- **deps**: Monthly nixpkgs flake.lock update (2026-10-19)
+  ([`cc78ca4`](https://github.com/bartei/nixos-cloud-images/commit/cc78ca459a64d0fd77d109882bc06baf473cb7ee))
+
+### Continuous Integration
+
+- Keep the monthly flake update going when one flake fails
+  ([`4c3418c`](https://github.com/bartei/nixos-cloud-images/commit/4c3418cea4ba0782896716edbd52ad42620ae7a3))
+
+### Documentation
+
+- Record first successful GitHub release in todo
+  ([`283c2b8`](https://github.com/bartei/nixos-cloud-images/commit/283c2b8b379654ff21e9bd69a06d37a6e9ab18f7))
+
+
 ## v1.6.3 (2026-10-19)
 
 ### Bug Fixes
