@@ -27,9 +27,9 @@
 ## Phase 5 — Forgejo mirror
 - [x] Remove Forgejo release.yml, update.yml and pyproject.toml; header in build.yml
 - [x] Add mirror job to GitHub release.yml (pinned host key, single-tag push)
-- [ ] Initial manual sync: main + v1.6.4 pushed to Forgejo
+- [x] Initial manual sync: main + v1.6.4 pushed to Forgejo
 - [ ] Forgejo build run for v1.6.4 publishes to the image server
-- [ ] Create write deploy key on Forgejo and FORGEJO_DEPLOY_KEY secret on GitHub
+- [x] Create write deploy key on Forgejo and FORGEJO_DEPLOY_KEY secret on GitHub
 - [ ] Next GitHub release mirrors main and tag automatically; Forgejo builds it
 
 ## Follow-ups
