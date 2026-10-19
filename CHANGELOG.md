@@ -2,6 +2,24 @@
 
 <!-- version list -->
 
+## v1.6.2 (2026-10-19)
+
+### Bug Fixes
+
+- Remove baked-in ssh keys and default user from ami and lxc images
+  ([`f0a1e0b`](https://github.com/bartei/nixos-cloud-images/commit/f0a1e0b69d0935c94457a7f4b498d7c9e57f2ed8))
+
+### Continuous Integration
+
+- Add GitHub release pipeline and monthly nixpkgs update workflows
+  ([`d9eab22`](https://github.com/bartei/nixos-cloud-images/commit/d9eab2271d9e4a0a09c590104a6284e518945f61))
+
+### Documentation
+
+- Add README, GPL-3.0-or-later LICENSE and CONTRIBUTING
+  ([`8c380ad`](https://github.com/bartei/nixos-cloud-images/commit/8c380adaa354dc5e383646a7fcd72d79f3400d0d))
+
+
 ## v1.6.1 (2026-05-30)
 
 ### Bug Fixes
