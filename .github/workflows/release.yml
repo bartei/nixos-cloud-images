@@ -57,7 +57,10 @@ jobs:
           for dir in vm/*/ ami/*/ lxc/*/; do
             [ -f "${dir}flake.nix" ] || continue
             echo "==> ${dir}"
-            ( cd "${dir}" && nix flake update )
+            # One flake failing (e.g. an input that stopped resolving) must not
+            # block the others: warn and move on. Changes already written stay.
+            ( cd "${dir}" && nix flake update ) \
+              || echo "::warning::nix flake update failed for ${dir}; skipping it"
           done
 
       - name: Commit and push if anything changed

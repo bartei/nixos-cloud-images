@@ -93,6 +93,12 @@ If `git status --porcelain` is empty after updating, the job exits 0 without
 committing. Branches that have stopped moving (e.g. an end-of-life NixOS release)
 simply produce no change.
 
+### Update loop tolerates a failing flake
+`nix flake update` on an end-of-life release exits 0 with no change (nixpkgs keeps
+every release branch), so no version is skipped. A flake that does fail is
+reported with a warning and the loop moves on, so one broken input cannot block
+the monthly update for the others.
+
 ### Schedule: monthly, not weekly
 `0 3 1 * *` — the 1st of every month, 03:00 UTC. Weekly was the first choice but
 was rejected because every run that finds a change produces a full new image set

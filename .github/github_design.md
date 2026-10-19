@@ -131,6 +131,14 @@ is skipped by design, `release` survives because its condition starts with
 `!cancelled() && needs.release.result == 'success' && needs.release.outputs.released == 'true'`.
 Rule for this workflow: every job downstream of `update` spells out its condition.
 
+### Update loop tolerates a failing flake
+`nix flake update` on an end-of-life release does **not** fail: nixpkgs keeps every
+`nixos-*` branch, so the command exits 0 with no change (checked 2026-10-18 on
+`vm/nixos-25.05`, pinned at the branch head of 2026-01-02). Still, a flake whose
+input stops resolving would otherwise abort the whole monthly run under `set -e`,
+so the loop warns and continues on a per-flake failure instead. Nothing is
+skipped pre-emptively; versions are updated as long as their branch moves.
+
 ### Monthly cadence
 Same `0 3 1 * *` as the Forgejo `update.yml`, for the same reason (one image set
 per run; keep the pile small). GitHub only runs scheduled workflows from the

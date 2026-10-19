@@ -32,7 +32,10 @@ jobs:
             echo "==> ${dir}"
             # cd + bare `nix flake update`: the path/--flake argument form differs
             # between Nix versions and the runner's Nix is not pinned.
-            ( cd "${dir}" && nix flake update )
+            # One flake failing (e.g. an input that stopped resolving) must not
+            # block the others: warn and move on. Changes already written stay.
+            ( cd "${dir}" && nix flake update ) \
+              || echo "WARNING: nix flake update failed for ${dir}; skipping it"
           done
 
       - name: Commit and push if anything changed
