@@ -45,7 +45,7 @@ jobs:
     if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.flake_update)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: main
 
@@ -86,7 +86,7 @@ jobs:
       tag: ${{ steps.semrel.outputs.tag }}
       matrix: ${{ steps.plan.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # Tip of main, not github.sha: picks up the commit `update` just pushed.
           ref: main
@@ -134,7 +134,7 @@ jobs:
       VERSION: ${{ matrix.version }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ needs.release.outputs.tag }}
 
