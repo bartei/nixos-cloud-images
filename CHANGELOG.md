@@ -2,6 +2,30 @@
 
 <!-- version list -->
 
+## v1.6.5 (2026-11-01)
+
+### Bug Fixes
+
+- **deps**: Monthly nixpkgs flake.lock update (2026-11-01)
+  ([`de8a579`](https://github.com/bartei/nixos-cloud-images/commit/de8a57969cb4901f6b4d5f77542332aac507817b))
+
+### Continuous Integration
+
+- Make GitHub the single writer to main and mirror main + tags to Forgejo
+  ([`4a51019`](https://github.com/bartei/nixos-cloud-images/commit/4a5101934f0aea734f3aaf854a6fed790eb3d9cf))
+
+### Documentation
+
+- Forgejo build of v1.6.4 published to the image server
+  ([`b7be298`](https://github.com/bartei/nixos-cloud-images/commit/b7be298eeb2f3019a44e37eccd34df24ce2c076b))
+
+- List stable latest-release download links for every image
+  ([`e1d6d01`](https://github.com/bartei/nixos-cloud-images/commit/e1d6d016df5ab4722ec78aa46f4f3be840dc036b))
+
+- Record Forgejo sync and deploy key setup in todo
+  ([`365011e`](https://github.com/bartei/nixos-cloud-images/commit/365011ee25b2676cd148565b16c9d7ded41687b4))
+
+
 ## v1.6.4 (2026-10-19)
 
 ### Bug Fixes
